@@ -10,18 +10,18 @@ define( ["css!./devtool.css"],
 			if ( cnt.length === 0 ) {
 				$( '.qv-object' ).each( function ( i, el ) {
 					var s = angular.element( el ).scope();
-					if ( s.$$childHead && s.$$childHead.layout ) {
-						var layout = s.$$childHead.layout, model = s.$$childHead.model;
+					if ( s.layout || (s.$$childHead && s.$$childHead.layout) ) {
+						var layout = s.layout || s.$$childHead.layout, model = s.model || s.$$childHead.model;
 						$( el ).append( '<div class="devtool-tooltip">' +
 						'<a class="devtool-btn" title="properties"><i class="small material-icons">view_list</i></a>' +
-						'<div>' + layout.qInfo.qId + ' ('+model.handle+')</div>' +
+						'<div>' + layout.qInfo.qId + ' (' + model.handle + ')</div>' +
 						'<div>' + layout.visualization + '</div>' +
 						"</div>" );
-						$(el ).find('.devtool-btn' ).on('click',function(){
-							model.getProperties().then(function(reply){
-								alert(JSON.stringify(reply,null,2));
-							});
-						});
+						$( el ).find( '.devtool-btn' ).on( 'click', function () {
+							model.getProperties().then( function ( reply ) {
+								alert( JSON.stringify( reply, null, 2 ) );
+							} );
+						} );
 					} else {
 						console.log( "No ID found" );
 					}
