@@ -8,7 +8,7 @@ define( ["css!./devtool.css"],
 		function toggleId () {
 			var cnt = $( ".devtool-tooltip" ).remove();
 			if ( cnt.length === 0 ) {
-				$( '.qv-object' ).each( function ( i, el ) {
+                $( '.qv-object, .qv-panel-sheet' ).each( function ( i, el ) {
 					var s = angular.element( el ).scope();
 					if ( s.layout || (s.$$childHead && s.$$childHead.layout) ) {
 						var layout = s.layout || s.$$childHead.layout, model = s.model || s.$$childHead.model;
