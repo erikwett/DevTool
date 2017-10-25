@@ -80,3 +80,6 @@
 	line-height: 55.5px;
 	font-size: 2.2rem;
 }
+.devtool-tooltip .devtool-btn {
+	top: 2px;
+}
