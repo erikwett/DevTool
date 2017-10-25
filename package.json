@@ -1,0 +1,28 @@
+{
+  "name": "DevTool",
+  "version": "3.0.0",
+  "description": "Developer Tool extension",
+  "keywords": "qliksense extension",
+  "main": "devtool.js",
+  "icon": "cogwheel",
+  "private": true,
+  "homepage": "https://github.com/erikwett/devtool",
+  "bugs": "https://github.com/erikwett/devtool/issues",
+  "author": "Erik Wetterberg",
+  "license": "MIT",
+  "repository": "https://github.com/erikwett/qsVariable",
+  "devDependencies": {
+    "cssnano": "^3.4.0",
+    "del": "^2.0.2",
+    "gulp": "^3.9.0",
+    "gulp-cssnano": "^2.1.0",
+    "gulp-ignore": "^2.0.1",
+    "gulp-less": "^3.0.3",
+    "gulp-replace": "^0.5.4",
+    "gulp-util": "^3.0.7",
+    "gulp-zip": "^3.0.2",
+    "less-plugin-autoprefix": "^1.5.1",
+    "requirejs": "^2.1.22",
+    "run-sequence": "^1.1.2"
+  }
+}
