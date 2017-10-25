@@ -3,10 +3,18 @@ Developer tool extension for Qlik Sense
 
 ##Allows the user to display id, type, handle and properties for visualizations.
 
-This extension adds a floating action button to your Qlik Sense app. When you press the button it will add labels with id, type and handle to all visualizations on the sheet. The labels also contains buttons to display properties for the visualizations.
+This extension adds a floating action button to your Qlik Sense app. When you press the button it will add labels with id, type and handle to all visualizations on the sheet. The labels also contains buttons to display properties for the visualizations. And from version 3 they also containg some data on calculations and calculation times.
 
 This can be useful if you for example are creating a mashup and need the object ids or for troubleshooting your extension.
 ![](devtool.png)
+
+###News in Version 3
+Calculation data: The extension now also shows some data on calculations:
+![](devtool2.png) 
+
+calc: number of calculations performed
+ms: total number of milliseconds waiting for calculations
+max: longest time for a calculation
 
 ###News in Version 2
 
