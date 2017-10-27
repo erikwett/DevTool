@@ -10,31 +10,9 @@ var DIST = './dist',
 	MAIN = pkg.main.substring(0, pkg.main.indexOf('.')),
 	NAME = pkg.name,
 	DEPLOY = process.env.HOMEDRIVE + process.env.HOMEPATH + '/Documents/Qlik/Sense/Extensions/' + NAME;
-//TODO:breaks with the css file. perhaps not really needed...
-gulp.task('requirejs', function (ready) {
-	var requirejs = require('requirejs');
-	var replace = require('gulp-replace');
-	var DIRNAME = "extensions/" + MAIN + "/";
-	requirejs.optimize({
-		baseUrl: SRC,
-		paths: {
-			"qlik": "empty:"
-		},
-		include: [MAIN],
-		exclude: ['qlik'],
-		// optimize : 'uglify',
-		findNestedDependencies: true,
-		out: TMP + '/' + MAIN + '.js'
-	}, function () {
-		gulp.src(TMP + '/' + MAIN + '.js').
-			pipe(replace('define("' + MAIN + '",', 'define(')).
-			pipe(replace('define("', 'define("' + DIRNAME)).
-			pipe(gulp.dest(DIST));
-		ready();
-	}, function (error) {
-		console.error('requirejs task failed', JSON.stringify(error));
-		process.exit(1);
-	});
+gulp.task('js', function (ready) {
+	return gulp.src(SRC + '/**/*.js')
+		.pipe(gulp.dest(DIST));
 });
 gulp.task('qext', function () {
 	var qext = {
@@ -83,7 +61,7 @@ gulp.task('clean', function (ready) {
 	ready();
 });
 
-gulp.task('zip-build', ['qext', 'less', 'css', 'requirejs'], function () {
+gulp.task('zip-build', ['qext', 'less', 'css', 'js'], function () {
 	var zip = require('gulp-zip');
 	return gulp.src(DIST + '/**/*')
 		.pipe(zip(NAME + '.zip'))
@@ -96,14 +74,8 @@ gulp.task('build', function () {
 	);
 });
 
-gulp.task('debug', ['less', 'qext', 'css'], function () {
-	return gulp.src([DIST + '/**/*.qext', SRC + '/**/*.js', DIST + '/**/*.css'])
-		.pipe(gulp.dest(DEPLOY));
-
-});
-
-gulp.task('deploy', ['less', 'qext', 'css', 'requirejs'], function () {
-	return gulp.src([DIST + '/**/*.qext', DIST + '/**/*.js', DIST + '/**/*.css'])
+gulp.task('debug', ['less', 'qext', 'css', 'js'], function () {
+	return gulp.src([DIST + '/**/*'])
 		.pipe(gulp.dest(DEPLOY));
 });
 
