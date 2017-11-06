@@ -83,3 +83,18 @@
 .devtool-tooltip .devtool-btn {
 	top: 2px;
 }
+.devtool-properties-content {
+	max-height: 90vh;
+	overflow-y: auto;
+	margin-top:20px;
+	-webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+.devtool-properties-copybtn {
+	top: 5px;
+	left: 5px;
+	height: 30px;
+	width: 30px;
+}
