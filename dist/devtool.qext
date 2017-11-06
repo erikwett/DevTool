@@ -1,8 +1,0 @@
-{
-    "name": "DevTool",
-    "description": "Developer Tool extension",
-    "version": "3.0.0",
-    "type": "visualization",
-    "author": "Erik Wetterberg",
-    "icon": "cogwheel"
-}
