@@ -1,9 +1,0 @@
-{
-	"name" : "Developer Tool",
-	"description" : "Developer Tool",
-	"preview": "devtool.png",
-	"type" : "visualization",
-	"icon" : "cogwheel",
-	"version": "2.0",
-	"author": "Erik Wetterberg"
-}
