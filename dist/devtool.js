@@ -1,9 +1,9 @@
-define(["css!./devtool.css"],
+define(["./lib/jquery.modal.min", "css!./devtool.css", "css!./lib/jquery.modal.min.css"],
 
 	/**
 	 * @owner Erik Wetterberg (ewg)
 	 */
-	function () {
+	function (modal) {
 		$('<link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet">').appendTo("head");
 		function toggleId() {
 			var cnt = $(".devtool-tooltip").remove();
@@ -27,7 +27,7 @@ define(["css!./devtool.css"],
 								timing.cnt++;
 								timing.tot += timing.latest;
 								timing.max = Math.max(timing.max, timing.latest);
-								$(el).find('.devtool-timing').html('calc:' + timing.cnt + ' ms:' + timing.tot + ' max:' + timing.max);
+								$(el).find('.devtool-timing').html('calc:' + timing.cnt + ' last ms:' + timing.latest + ' max:' + timing.max);
 							}
 						});
 						model.Invalidated.bind(function () {
@@ -35,7 +35,26 @@ define(["css!./devtool.css"],
 						});
 						$(el).find('.devtool-btn').on('click', function () {
 							model.getProperties().then(function (reply) {
-								alert(JSON.stringify(reply, null, 2));
+								$('body').append(
+									'<div class="devtool-properties modal">' +
+									'<pre><div class="devtool-properties-content"></div></pre></div>'
+								).on($.modal.CLOSE, function(event, modal) {
+									$('.devtool-properties').remove();
+								});
+								$(".devtool-properties-content").html(JSON.stringify(reply, null, 2));
+																
+								// I'm using a button for copy-to-clipboard, otherwise marked text loses focus if another element type is used.
+								$('<button title = "copy to clipboard" class="devtool-btn devtool-properties-copybtn small material-icons">content_copy</button>')
+								.click( function(event) {
+									if (! window.getSelection().toString()) {	// If no user selection, then select everything
+										selectElemText($('.devtool-properties-content')[0]);
+									}
+									document.execCommand("Copy");
+									window.getSelection().removeAllRanges();
+								})
+								.prependTo(".devtool-properties");
+								
+								$('.devtool-properties').modal();								
 							});
 						});
 					} else {
@@ -44,6 +63,15 @@ define(["css!./devtool.css"],
 				});
 			}
 		}
+
+		// Function to select all text in an element
+		function selectElemText(elem) {
+			var range = document.createRange();
+			range.selectNodeContents(elem);
+			console.log(range.toString());
+			window.getSelection().removeAllRanges();
+			window.getSelection().addRange(range);			
+		};
 
 		return {
 			initialProperties: {
