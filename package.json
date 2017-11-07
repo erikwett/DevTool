@@ -1,6 +1,6 @@
 {
   "name": "DevTool",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Developer Tool extension",
   "keywords": "qliksense extension",
   "main": "devtool.js",
@@ -9,6 +9,7 @@
   "homepage": "https://github.com/erikwett/devtool",
   "bugs": "https://github.com/erikwett/devtool/issues",
   "author": "Erik Wetterberg",
+  "contributors": ["Rob Wunderlich"],
   "license": "MIT",
   "repository": "https://github.com/erikwett/qsVariable",
   "devDependencies": {
