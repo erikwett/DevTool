@@ -54,6 +54,7 @@
 	--background-color: #2bbbad;
 	background-color: #D22114;
 }
+
 .devtool-btn i{
 	line-height: 25px;
 	font-size: 21px;
@@ -76,6 +77,7 @@
 	-moz-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
 	box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
 }
+
 .devtool-btn.fab i{
 	line-height: 55.5px;
 	font-size: 2.2rem;
@@ -83,18 +85,68 @@
 .devtool-tooltip .devtool-btn {
 	top: 2px;
 }
+.devtool-btn.devtool-btn-close {
+	top: -12px;
+	right:-12px;
+	left: auto;
+	bottom: auto;
+/*	z-index: 1051; */
+	color: #FFF;
+	background-color: #F44336;
+	opacity: initial;
+}
+.devtool-btn.devtool-btn-close:hover {
+	background-color: #D22114;
+	color: #FFF;
+	opacity: initial;
+}
+.devtool-btn.devtool-btn-copy {
+	top: 5px;
+	left: 5px;
+	/*z-index: 1; */
+}
 .devtool-properties-content {
 	max-height: 90vh;
 	overflow-y: auto;
 	margin-top:20px;
+	white-space: pre-wrap;
 	-webkit-user-select: text;
     -moz-user-select: text;
     -ms-user-select: text;
     user-select: text;
 }
-.devtool-properties-copybtn {
-	top: 5px;
-	left: 5px;
-	height: 30px;
-	width: 30px;
+.devtool-context-menu {
+	position: fixed; 
+	top: auto;
+	left: auto;
+	bottom: 5px;
+	right: 17px;
+	height: 200px;
+	width: 400px; 
+	background-color: #FFF;
+}
+.devtool-context-option {
+	background-color: #FFFFFF;
+	border:none;
+	display:inline-block;
+	cursor:pointer;
+	color:#F44336;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	margin-top: 4px;
+	margin-left: 10px;
+	margin-right: 24px;
+	text-decoration:underline;
+	z-index: 2000;
+}
+.devtool-context-option:hover {
+	color: #D22114;	
+}
+
+.devtool-context-msg {
+	position: absolute;
+	margin-left: 10px;
+	height: 3.5em;
+	bottom:6px;
 }
