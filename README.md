@@ -9,14 +9,15 @@ This can be useful if you for example are creating a mashup and need the object 
 ![](devtool.png)
 ### News in Version 3.2
 A new context menu provides functions to export/import script and export variables. 
-![](devtool3.png) 
 
+![](devtool3.png) 
 ### News in Version 3.1
 Properties are now shown in a modal window, no longer with javascript alert.
 Timing show latest calc time, not max
 
 ### News in Version 3
 Calculation data: The extension now also shows some data on calculations:
+
 ![](devtool2.png) 
 
 calc: number of calculations performed
