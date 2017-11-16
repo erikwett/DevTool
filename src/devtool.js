@@ -1,4 +1,5 @@
 var engineApp;
+var modalsInitialized = false;
 
 define(["qlik",
 	"./lib/download",				// download.js module
@@ -17,7 +18,8 @@ define(["qlik",
 		$('<link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet">').appendTo("head");
 		$.modal.defaults = {
 			clickClose: false,
-			showClose: false
+			showClose: false,
+			blockerClass: "devtool-modal-blocker"
 		};
 		engineApp = qlik.currApp(this).model.engineApp;	
 
@@ -71,7 +73,10 @@ define(["qlik",
 				$(document.body).append("<button class='devtool-btn fab'><i class='material-icons'>settings</i></button>");
 				$(".devtool-btn").on("click", toggleId);
 				$(".devtool-btn").on("contextmenu", showContextMenu);
-				initModals(qlik, download, devtoolContextMenu)
+				if (!modalsInitialized) {
+					initModals(qlik, download, devtoolContextMenu)
+				}
+				
 				
 			}
 		};
@@ -80,6 +85,9 @@ define(["qlik",
 //===== Show Context Menu =====
 function showContextMenu() {
 	//===== Show the context menu ====
+	if ($.modal.isActive()) {	// Guard against multiple opens
+		$.modal.close();
+	}
 	$(".devtool-context-msg").html("");	// Clear existing message
 	$('.devtool-context-menu').modal();	
 }
@@ -112,6 +120,7 @@ function initModals(qlik, download, devtoolContextMenu) {
 			console.log("unknown option " + command );
 		}
 	});	
+	modalsInitialized = true;
 }
 
 //==== Copy-to-Clipboard function ====	

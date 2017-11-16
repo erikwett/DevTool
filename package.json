@@ -1,6 +1,6 @@
 {
   "name": "DevTool",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "Developer Tool extension",
   "keywords": "qliksense extension",
   "main": "devtool.js",
