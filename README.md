@@ -7,8 +7,11 @@ This extension adds a floating action button to your Qlik Sense app. When you pr
 
 This can be useful if you for example are creating a mashup and need the object ids or for troubleshooting your extension.
 ![](devtool.png)
+### News in Version 3.1
+Properties are now shown in a modal window, no longer with javascript alert.
+Timing show latest calc time, not max
 
-###News in Version 3
+### News in Version 3
 Calculation data: The extension now also shows some data on calculations:
 ![](devtool2.png) 
 
@@ -16,7 +19,7 @@ calc: number of calculations performed
 ms: total number of milliseconds waiting for calculations
 max: longest time for a calculation
 
-###News in Version 2
+### News in Version 2
 
 1. Floating action button
 The button is now a FAB button, which will remain on screen until you refresh the page, even if you change sheet.
