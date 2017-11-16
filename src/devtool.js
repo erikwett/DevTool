@@ -75,8 +75,6 @@ define(["qlik",
 				
 			}
 		};
-
-		
 });
 
 //===== Show Context Menu =====
@@ -104,6 +102,9 @@ function initModals(qlik, download, devtoolContextMenu) {
 			case "ExportScript":
 				exportScript(qlik, download);
 				break;	
+			case "ImportScript":
+				importScript(qlik);
+				break;	
 			case "ExportVariables":	
 				exportVariables(qlik, download, $(event.target).data("devtool-filetype"));
 				break;	
@@ -127,7 +128,7 @@ function copyToClipboard(elem) {
 
 //==== Script Export function ====			
 function exportScript(qlik, download) {
-	var filename = qlik.currApp(this).model.layout.qTitle + ".txt";	// App title will be used as filename
+	var filename = qlik.currApp(this).model.layout.qTitle + "-script.txt";
 	engineApp.getScript().then(function (reply) {
 		var data = 'data:text/plain;charset=utf-8,' + encodeURIComponent(reply.qScript);
 		download(data, filename, "text/plain");	// Download in the browser
@@ -135,6 +136,35 @@ function exportScript(qlik, download) {
 	});
 }	
 
+//==== Script Import function ====	
+function importScript(qlik) {
+	$("#devtool-input-file").remove();
+	$('body').append('<input type="file" id="devtool-input-file" style="display:none;">');
+	$("#devtool-input-file").change(function(){
+		var input = $("#devtool-input-file")[0];
+		if (input.files.length > 0) {
+			var file = input.files[0];
+			var reader = new FileReader();
+			reader.onload = function(){	// Callback for read complete
+			// Ask user to confirm script replace
+				var r = confirm("Confirm replace of application script with " + file.name + "? The *entire* script will be replaced.");
+				if (r == true) {
+				 engineApp.setScript(reader.result);	// Replace the script in the app
+				 $(".devtool-context-msg").html("Script replaced from " + file.name);
+				} else {
+				 $(".devtool-context-msg").html("Script replace cancelled");
+				}
+			};
+			reader.readAsText(file);	// Read the file contents, onload() will fire when done	
+		 } else {
+			 $(".devtool-context-msg").html("No file selected");
+		 }
+		 $("#devtool-input-file").remove();
+	});
+	$(".devtool-context-msg").html("No file selected");
+	$("#devtool-input-file").click();
+	
+}
 
 //==== Variables Export function ====
 function exportVariables(qlik, download, filetype) {
@@ -145,7 +175,7 @@ function exportVariables(qlik, download, filetype) {
 				var v = vars[index];
 				str += "SET " + v.qName + " = "  + v.qDefinition + ";\r\n";
 			}
-			var filename = qlik.currApp(this).model.layout.qTitle + "-variables.txt";	// App title + "-variables" will be used as filename
+			var filename = qlik.currApp(this).model.layout.qTitle + "-variables.txt";
 			var data = 'data:text/plain;charset=utf-8,' + encodeURIComponent(str);
 			download(data, filename, "text/plain");	// Download in the browser
 			$(".devtool-context-msg").html("Variables exported to " + filename);
@@ -154,7 +184,7 @@ function exportVariables(qlik, download, filetype) {
 	else {
 		var str="";
 		getVariables(engineApp).then(function(vars){
-			var filename = qlik.currApp(this).model.layout.qTitle + "-variables.json";	// App title + "-variables" will be used as filename
+			var filename = qlik.currApp(this).model.layout.qTitle + "-variables.json";
 			var data = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(vars, null, 2));
 			download(data, filename, "application/json");	// Download in the browser
 			$(".devtool-context-msg").html("Variables exported to " + filename);
@@ -162,32 +192,31 @@ function exportVariables(qlik, download, filetype) {
 	}
 }
 
-// Get all variables in app
+//===== Get all variables in app ====
 function getVariables(app) {	
 	return app.createSessionObject({
-			qVariableListDef: {
-					qType: 'variable',
-		qShowReserved: true,
-		qShowConfig: true,
-					qData: {
-							info: '/qDimInfos'
-					},
-					qMeta: {}
+		qVariableListDef: {
+			qType: 'variable',
+			qShowReserved: true,
+			qShowConfig: true,
+			qData: {
+				info: '/qDimInfos'
 			},
-			qInfo: { qId: "VariableList", qType: "VariableList" }
+			qMeta: {}
+		},
+		qInfo: { qId: "VariableList", qType: "VariableList" }
 	}).then(function (list) {
-			return list.getLayout().then(function (layout) {
-					return Promise.all(layout.qVariableList.qItems.map(function (d) {
-							return app.getVariableById(d.qInfo.qId).then(function (variable) {
-									return variable.getProperties().then(function(properties) {
-											if (d.qIsScriptCreated) properties.qIsScriptCreated = d.qIsScriptCreated;
-											if (d.qIsReserved) properties.qIsReserved = d.qIsReserved;
-											if (d.qIsConfig) properties.qIsConfig = d.qIsConfig;
-											
-											return properties; 
-									});
-							});
-					}));
-			});
+		return list.getLayout().then(function (layout) {
+			return Promise.all(layout.qVariableList.qItems.map(function (d) {
+				return app.getVariableById(d.qInfo.qId).then(function (variable) {
+					return variable.getProperties().then(function(properties) {
+						if (d.qIsScriptCreated) properties.qIsScriptCreated = d.qIsScriptCreated;
+						if (d.qIsReserved) properties.qIsReserved = d.qIsReserved;
+						if (d.qIsConfig) properties.qIsConfig = d.qIsConfig;
+						return properties; 
+					});
+				});
+			}));
+		});
 	});
 }
