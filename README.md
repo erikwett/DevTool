@@ -7,6 +7,10 @@ This extension adds a floating action button to your Qlik Sense app. When you pr
 
 This can be useful if you for example are creating a mashup and need the object ids or for troubleshooting your extension.
 ![](devtool.png)
+### News in Version 3.2
+A new context menu provides functions to export/import script and export variables. 
+![](devtool3.png) 
+
 ### News in Version 3.1
 Properties are now shown in a modal window, no longer with javascript alert.
 Timing show latest calc time, not max
