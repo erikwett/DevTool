@@ -182,9 +182,15 @@ function exportVariables(qlik, download, filetype) {
 	if(filetype == "script") {
 		var str="";
 		getVariables(engineApp).then(function(vars){
+			vars.sort(function(a,b){
+				var av = (a.qIsReserved ? '1' : '2') + a.qName;
+				var bv = (b.qIsReserved ? '1' : '2') + b.qName;
+				return av == bv ? 0 : av  < bv ? -1 : 1;
+			});
 			for (var index = 0; index < vars.length; index++) {
 				var v = vars[index];
-				str += "SET " + v.qName + " = "  + v.qDefinition + ";\r\n";
+				var comment = v.qComment != undefined ? "// " + v.qComment : "";
+				str += "SET " + v.qName + "='"  + v.qDefinition + "';"  + comment + "\r\n";
 			}
 			var filename = qlik.currApp(this).model.layout.qTitle + "-variables.txt";
 			var data = 'data:text/plain;charset=utf-8,' + encodeURIComponent(str);
@@ -210,9 +216,6 @@ function getVariables(app) {
 			qType: 'variable',
 			qShowReserved: true,
 			qShowConfig: true,
-			qData: {
-				info: '/qDimInfos'
-			},
 			qMeta: {}
 		},
 		qInfo: { qId: "VariableList", qType: "VariableList" }
