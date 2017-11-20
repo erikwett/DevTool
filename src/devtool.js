@@ -6,8 +6,8 @@ define(["qlik",
 	"text!./devtool-context-menu.html",
 	"./lib/jquery.modal.min",
 	"css!./lib/jquery.modal.min.css",
-	"./lib/jquery.dropdown.min",
-	"css!./lib/jquery.dropdown.min.css",
+	"./lib/contextMenu.min",
+	"css!./lib/contextMenu.css",
 	"css!./devtool.css"
 	],
 
@@ -69,15 +69,17 @@ define(["qlik",
 				version: 2.0,
 				showTitles: false
 			}, paint: function ($element) {
-				$(".devtool-btn").remove();
+				$(".devtool-btn.fab").remove();
 				$(document.body).append("<button class='devtool-btn fab'><i class='material-icons'>settings</i></button>");
-				$(".devtool-btn").on("click", toggleId);
-				$(".devtool-btn").on("contextmenu", showContextMenu);
+				$(".devtool-btn.fab").on("click", toggleId);
+//				$(".devtool-btn").on("contextmenu", showContextMenu);
 				if (!modalsInitialized) {
 					initModals(qlik, download, devtoolContextMenu)
 				}
-				
-				
+				$(".devtool-btn.fab").contextMenu('menu', $('#devtool-context-menu'), {
+					'triggerOn' : "contextmenu",
+					'displayAround' : 'trigger'
+				});
 			}
 		};
 });

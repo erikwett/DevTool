@@ -138,15 +138,11 @@
     user-select: text;
 }
 .devtool-context-menu {
-	position: fixed; 
-	top: auto;
-	left: auto;
-	bottom: 5px;
-	right: 17px;
-	height: 200px;
-	width: 400px; 
 	background-color: #FFF;
+	font-family:Arial;
+	font-size:15px;
 }
+
 .devtool-context-option {
 	background-color: #FFFFFF;
 	border:none;
