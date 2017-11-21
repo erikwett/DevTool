@@ -6,8 +6,8 @@ define(["qlik",
 	"text!./devtool-context-menu.html",
 	"./lib/jquery.modal.min",
 	"css!./lib/jquery.modal.min.css",
-	"./lib/jquery.dropdown.min",
-	"css!./lib/jquery.dropdown.min.css",
+	"./lib/contextMenu.min",
+	"css!./lib/contextMenu.css",
 	"css!./devtool.css"
 	],
 
@@ -69,15 +69,17 @@ define(["qlik",
 				version: 2.0,
 				showTitles: false
 			}, paint: function ($element) {
-				$(".devtool-btn").remove();
+				$(".devtool-btn.fab").remove();
 				$(document.body).append("<button class='devtool-btn fab'><i class='material-icons'>settings</i></button>");
-				$(".devtool-btn").on("click", toggleId);
-				$(".devtool-btn").on("contextmenu", showContextMenu);
+				$(".devtool-btn.fab").on("click", toggleId);
+//				$(".devtool-btn").on("contextmenu", showContextMenu);
 				if (!modalsInitialized) {
 					initModals(qlik, download, devtoolContextMenu)
 				}
-				
-				
+				$(".devtool-btn.fab").contextMenu('menu', $('#devtool-context-menu'), {
+					'triggerOn' : "contextmenu",
+					'displayAround' : 'trigger'
+				});
 			}
 		};
 });
@@ -180,9 +182,15 @@ function exportVariables(qlik, download, filetype) {
 	if(filetype == "script") {
 		var str="";
 		getVariables(engineApp).then(function(vars){
+			vars.sort(function(a,b){
+				var av = (a.qIsReserved ? '1' : '2') + a.qName;
+				var bv = (b.qIsReserved ? '1' : '2') + b.qName;
+				return av == bv ? 0 : av  < bv ? -1 : 1;
+			});
 			for (var index = 0; index < vars.length; index++) {
 				var v = vars[index];
-				str += "SET " + v.qName + " = "  + v.qDefinition + ";\r\n";
+				var comment = v.qComment != undefined ? "// " + v.qComment : "";
+				str += "SET " + v.qName + "='"  + v.qDefinition + "';"  + comment + "\r\n";
 			}
 			var filename = qlik.currApp(this).model.layout.qTitle + "-variables.txt";
 			var data = 'data:text/plain;charset=utf-8,' + encodeURIComponent(str);
@@ -208,9 +216,6 @@ function getVariables(app) {
 			qType: 'variable',
 			qShowReserved: true,
 			qShowConfig: true,
-			qData: {
-				info: '/qDimInfos'
-			},
 			qMeta: {}
 		},
 		qInfo: { qId: "VariableList", qType: "VariableList" }
