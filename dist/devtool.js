@@ -72,7 +72,6 @@ define(["qlik",
 				$(".devtool-btn.fab").remove();
 				$(document.body).append("<button class='devtool-btn fab'><i class='material-icons'>settings</i></button>");
 				$(".devtool-btn.fab").on("click", toggleId);
-//				$(".devtool-btn").on("contextmenu", showContextMenu);
 				if (!modalsInitialized) {
 					initModals(qlik, download, devtoolContextMenu)
 				}
@@ -181,17 +180,36 @@ function importScript(qlik) {
 function exportVariables(qlik, download, filetype) {
 	if(filetype == "script") {
 		var str="";
+		var lastSort="";
 		getVariables(engineApp).then(function(vars){
-			vars.sort(function(a,b){
-				var av = (a.qIsReserved ? '1' : '2') + a.qName;
-				var bv = (b.qIsReserved ? '1' : '2') + b.qName;
+			vars.map(function(v){
+				v.devtoolSortGroup = (v.qIsReserved ? '11' : v.qIsScriptCreated ? '21' : '22');
+				return v;
+			}).sort(function(a,b){
+				var av = a.devtoolSortGroup + a.qName;
+				var bv = b.devtoolSortGroup + b.qName;
 				return av == bv ? 0 : av  < bv ? -1 : 1;
-			});
-			for (var index = 0; index < vars.length; index++) {
-				var v = vars[index];
+			}).forEach(function(v) {
+				if(v.devtoolSortGroup != lastSort) {
+					switch (v.devtoolSortGroup) {
+						case "11":
+							str += "// ***** Reserved Variables *****\r\n";
+							break;
+						case "21":
+							str += "// *****  Script Defined Variables ***** \r\n";
+							break;
+						case "22":
+							str += "// *****  Non-script Defined Variables ***** \r\n";
+							break;
+						default:
+							break;
+					}
+				}
+				lastSort = v.devtoolSortGroup;
 				var comment = v.qComment != undefined ? "// " + v.qComment : "";
 				str += "SET " + v.qName + "='"  + v.qDefinition + "';"  + comment + "\r\n";
-			}
+			});
+			
 			var filename = qlik.currApp(this).model.layout.qTitle + "-variables.txt";
 			var data = 'data:text/plain;charset=utf-8,' + encodeURIComponent(str);
 			download(data, filename, "text/plain");	// Download in the browser
