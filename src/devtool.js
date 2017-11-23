@@ -11,7 +11,7 @@ define(["qlik",
 	/**
 	 * @owner Erik Wetterberg (ewg)
 	 */
-	function (qlik, download, devtoolContextMenu) {
+	function (qlik, download, devtoolHtml) {
 		$('<link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet">').appendTo("head");
 		var modalsInitialized = false;
 		var engineApp = qlik.currApp(this).model.engineApp;	
@@ -61,12 +61,12 @@ define(["qlik",
 			}
 		}
 		// Initialize the modal windows
-		function initModals(qlik, download, devtoolContextMenu) {
+		function initModals(qlik, download, devtoolHtml) {
 			// Remove existing elements
 			$(".devtool-context-menu").remove();
 			$(".devtool-properties").remove();
 			// Add modals to the DOM
-			$('body').append(devtoolContextMenu);
+			$('body').append(devtoolHtml);
 			
 			// Command router
 			$("[data-devtool-command]").click(function(event) {
@@ -146,7 +146,6 @@ define(["qlik",
 				}
 				$("#devtool-input-file").remove();
 			});
-			showMsg("No file selected");
 			$("#devtool-input-file").click();
 		}
 
@@ -236,7 +235,7 @@ define(["qlik",
 				$(document.body).append("<button class='devtool-btn fab'><i class='material-icons'>settings</i></button>");
 				$(".devtool-btn.fab").on("click", toggleId);
 				if (!modalsInitialized) {
-					initModals(qlik, download, devtoolContextMenu)
+					initModals(qlik, download, devtoolHtml)
 				}
 				$(".devtool-btn.fab").contextMenu('menu', $('#devtool-context-menu'), {
 					'triggerOn' : "contextmenu",

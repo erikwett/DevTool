@@ -127,29 +127,31 @@
 	left: 5px;
 	z-index: 2
 }
-.devtool-properties-content {
+.devtool-properties {
 	max-height: 90vh;
-	overflow-y: auto;
 	margin-top:20px;
+	border-radius: 2px;
+}
+.devtool-properties-content {
+	max-height: 84vh;
 	white-space: pre-wrap;
+	position: relative;
 	-webkit-user-select: text;
     -moz-user-select: text;
     -ms-user-select: text;
-    user-select: text;
+	user-select: text;
+	overflow-y: auto;
 }
 .devtool-context-menu {
-	background-color: #FFF;
-	font-family:Arial;
-	font-size:15px;
-}
-.devtool-context-menu li:hover{
-	background-color: darkgray;
+	font-size:13px;
 }
 .devtool-context-msg {
 	position: absolute;
-	margin-left: 10px;
-	height: 3.5em;
 	bottom:6px;
+	border-radius: 2px;
+}
+.devtool-context-msg-content {
+	height: 3.5em;
 }
 .devtool-modal-blocker {
 	z-index: 2;
