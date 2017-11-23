@@ -142,23 +142,8 @@
 	font-family:Arial;
 	font-size:15px;
 }
-
-.devtool-context-option {
-	background-color: #FFFFFF;
-	border:none;
-	display:inline-block;
-	cursor:pointer;
-	color:#F44336;
-	font-family:Arial;
-	font-size:15px;
-	font-weight:bold;
-	margin-top: 4px;
-	margin-left: 10px;
-	margin-right: 24px;
-	text-decoration:underline;
-}
-.devtool-context-option:hover {
-	color: #D22114;	
+.devtool-context-menu li:hover{
+	background-color: darkgray;
 }
 .devtool-context-msg {
 	position: absolute;

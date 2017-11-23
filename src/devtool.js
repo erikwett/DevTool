@@ -16,11 +16,6 @@ define(["qlik",
 	 */
 	function (qlik, download, devtoolContextMenu) {
 		$('<link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet">').appendTo("head");
-		$.modal.defaults = {
-			clickClose: false,
-			showClose: false,
-			blockerClass: "devtool-modal-blocker"
-		};
 		engineApp = qlik.currApp(this).model.engineApp;	
 
 		function toggleId() {
@@ -54,7 +49,11 @@ define(["qlik",
 						$(el).find('.devtool-btn').on('click', function () {
 							model.getProperties().then(function (reply) {
 								$(".devtool-properties-content").html(JSON.stringify(reply, null, 2));
-								$('.devtool-properties').modal();								
+								$('.devtool-properties').modal({
+									clickClose: false,
+									showClose: false,
+									blockerClass: "devtool-modal-blocker"
+								});								
 							});
 						});
 					} else {
@@ -83,15 +82,6 @@ define(["qlik",
 		};
 });
 
-//===== Show Context Menu =====
-function showContextMenu() {
-	//===== Show the context menu ====
-	if ($.modal.isActive()) {	// Guard against multiple opens
-		$.modal.close();
-	}
-	$(".devtool-context-msg").html("");	// Clear existing message
-	$('.devtool-context-menu').modal();	
-}
 
 // Initialize the modal windows
 function initModals(qlik, download, devtoolContextMenu) {
@@ -124,6 +114,13 @@ function initModals(qlik, download, devtoolContextMenu) {
 	modalsInitialized = true;
 }
 
+function showMsg(msg) {
+	$(".devtool-context-msg-content").html(msg);
+	$('.devtool-context-msg').modal({
+	 	showClose: false
+	});
+}
+
 //==== Copy-to-Clipboard function ====	
 function copyToClipboard(elem) {
 	if (! window.getSelection().toString()) {	// If no user selection, then select everything
@@ -142,7 +139,7 @@ function exportScript(qlik, download) {
 	engineApp.getScript().then(function (reply) {
 		var data = 'data:text/plain;charset=utf-8,' + encodeURIComponent(reply.qScript);
 		download(data, filename, "text/plain");	// Download in the browser
-		$(".devtool-context-msg").html("Script exported to " + filename);
+		showMsg("Script exported to " + filename);
 	});
 }	
 
@@ -160,18 +157,18 @@ function importScript(qlik) {
 				var r = confirm("Confirm replace of application script with " + file.name + "? The *entire* script will be replaced.");
 				if (r == true) {
 				 engineApp.setScript(reader.result);	// Replace the script in the app
-				 $(".devtool-context-msg").html("Script replaced from " + file.name);
+				 showMsg("Script replaced from " + file.name);
 				} else {
-				 $(".devtool-context-msg").html("Script replace cancelled");
+					showMsg("Script replace cancelled");
 				}
 			};
 			reader.readAsText(file);	// Read the file contents, onload() will fire when done	
 		 } else {
-			 $(".devtool-context-msg").html("No file selected");
+			showMsg("No file selected");
 		 }
 		 $("#devtool-input-file").remove();
 	});
-	$(".devtool-context-msg").html("No file selected");
+	showMsg("No file selected");
 	$("#devtool-input-file").click();
 	
 }
@@ -213,7 +210,7 @@ function exportVariables(qlik, download, filetype) {
 			var filename = qlik.currApp(this).model.layout.qTitle + "-variables.txt";
 			var data = 'data:text/plain;charset=utf-8,' + encodeURIComponent(str);
 			download(data, filename, "text/plain");	// Download in the browser
-			$(".devtool-context-msg").html("Variables exported to " + filename);
+			showMsg("Variables exported to " + filename);
 		});
 	}
 	else {
@@ -222,7 +219,7 @@ function exportVariables(qlik, download, filetype) {
 			var filename = qlik.currApp(this).model.layout.qTitle + "-variables.json";
 			var data = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(vars, null, 2));
 			download(data, filename, "application/json");	// Download in the browser
-			$(".devtool-context-msg").html("Variables exported to " + filename);
+			showMsg("Variables exported to " + filename);
 		});
 	}
 }

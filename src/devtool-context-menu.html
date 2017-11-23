@@ -1,13 +1,13 @@
-<ul id="devtool-context-menu" class="devtool-context-menu">  
+<ul id="devtool-context-menu">  
 	<li>Script
-		<ul class="devtool-context-menu"> 
+		<ul> 
 			<li data-devtool-command="ExportScript">Export</li> 
 			<li data-devtool-command="ImportScript">Import</li> 
 		</ul> 
 	</li> 	
 
 	<li>Variables
-		<ul class="devtool-context-menu"> 
+		<ul> 
 			<li data-devtool-command="ExportVariables" data-devtool-filetype="script">Export as Script</li> 
 			<li data-devtool-command="ExportVariables" data-devtool-filetype="json">Export as JSON</li> 
 		</ul> 
@@ -15,7 +15,10 @@
 </ul>  
 
 
-<div class="devtool-context-msg"></div>   
+<div class="devtool-context-msg modal">
+	<a class="devtool-btn-close" rel="modal:close" title="close"><i class="material-icons">close</i></a>
+	<div class="devtool-context-msg-content"></div>
+</div>   
 
 <div class="devtool-properties modal">
 	<a class="devtool-btn-close" rel="modal:close" title="close"><i class="material-icons">close</i></a>
