@@ -1,13 +1,25 @@
-define(["./lib/jquery.modal.min", "css!./devtool.css", "css!./lib/jquery.modal.min.css"],
+define(["qlik",
+	"./lib/download",				// download.js module
+	"text!./devtool-context-menu.html",
+	"./lib/jquery.modal.min",
+	"css!./lib/jquery.modal.min.css",
+	"./lib/contextMenu.min",
+	"css!./lib/contextMenu.css",
+	"css!./devtool.css"
+	],
 
 	/**
 	 * @owner Erik Wetterberg (ewg)
 	 */
-	function (modal) {
+	function (qlik, download, devtoolHtml) {
 		$('<link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet">').appendTo("head");
+		var modalsInitialized = false;
+		var engineApp = qlik.currApp(this).model.engineApp;	
+
 		function toggleId() {
 			var cnt = $(".devtool-tooltip").remove();
 			if (cnt.length === 0) {
+				
 				$('.qv-object, .qv-panel-sheet').each(function (i, el) {
 					var s = angular.element(el).scope();
 					if (s.layout || (s.$$childHead && s.$$childHead.layout)) {
@@ -15,7 +27,6 @@ define(["./lib/jquery.modal.min", "css!./devtool.css", "css!./lib/jquery.modal.m
 							timing = { max: 0, latest: 0, start: 0, cnt: 0, tot: 0 };
 						$(el).append('<div class="devtool-tooltip">' +
 							'<a class="devtool-btn" title="properties"><i class="small material-icons">view_list</i></a>' +
-							//'<a class="devtool-btn" title="timing"><i class="small material-icons">timer</i></a>' +
 							'<div>' + layout.qInfo.qId + ' (' + model.handle + ')</div>' +
 							'<div>' + layout.visualization + '</div>' +
 							'<div class="devtool-timing"></div>' +
@@ -35,26 +46,12 @@ define(["./lib/jquery.modal.min", "css!./devtool.css", "css!./lib/jquery.modal.m
 						});
 						$(el).find('.devtool-btn').on('click', function () {
 							model.getProperties().then(function (reply) {
-								$('body').append(
-									'<div class="devtool-properties modal">' +
-									'<pre><div class="devtool-properties-content"></div></pre></div>'
-								).on($.modal.CLOSE, function(event, modal) {
-									$('.devtool-properties').remove();
-								});
 								$(".devtool-properties-content").html(JSON.stringify(reply, null, 2));
-																
-								// I'm using a button for copy-to-clipboard, otherwise marked text loses focus if another element type is used.
-								$('<button title = "copy to clipboard" class="devtool-btn devtool-properties-copybtn small material-icons">content_copy</button>')
-								.click( function(event) {
-									if (! window.getSelection().toString()) {	// If no user selection, then select everything
-										selectElemText($('.devtool-properties-content')[0]);
-									}
-									document.execCommand("Copy");
-									window.getSelection().removeAllRanges();
-								})
-								.prependTo(".devtool-properties");
-								
-								$('.devtool-properties').modal();								
+								$('.devtool-properties').modal({
+									clickClose: false,
+									showClose: false,
+									blockerClass: "devtool-modal-blocker"
+								});								
 							});
 						});
 					} else {
@@ -63,25 +60,187 @@ define(["./lib/jquery.modal.min", "css!./devtool.css", "css!./lib/jquery.modal.m
 				});
 			}
 		}
+		// Initialize the modal windows
+		function initModals(qlik, download, devtoolHtml) {
+			// Remove existing elements
+			$(".devtool-context-menu").remove();
+			$(".devtool-properties").remove();
+			// Add modals to the DOM
+			$('body').append(devtoolHtml);
+			
+			// Command router
+			$("[data-devtool-command]").click(function(event) {
+				var command = $(event.currentTarget).data("devtool-command");
+				switch (command) {
+					case "Copy":
+						copyToClipboard($('.devtool-properties-content')[0]);
+						break;
+					case "ExportScript":
+						exportScript(qlik, download);
+						break;	
+					case "ImportScript":
+						importScript(qlik);
+						break;	
+					case "ExportVariables":	
+						exportVariables(qlik, download, $(event.target).data("devtool-filetype"));
+						break;	
+					default:
+					console.log("unknown option " + command );
+				}
+			});	
+			modalsInitialized = true;
+		}
 
-		// Function to select all text in an element
-		function selectElemText(elem) {
-			var range = document.createRange();
-			range.selectNodeContents(elem);
-			console.log(range.toString());
+		//==== Display a status message ====	
+		function showMsg(msg) {
+			$(".devtool-context-msg-content").html(msg);
+			$('.devtool-context-msg').modal({
+				showClose: false
+			});
+		}
+
+		//==== Copy-to-Clipboard function ====	
+		function copyToClipboard(elem) {
+			if (! window.getSelection().toString()) {	// If no user selection, then select everything
+				var range = document.createRange();
+				range.selectNodeContents(elem);
+				window.getSelection().removeAllRanges();
+				window.getSelection().addRange(range);	
+			}
+			document.execCommand("Copy");
 			window.getSelection().removeAllRanges();
-			window.getSelection().addRange(range);			
-		};
+		}
+
+		//==== Script Export function ====			
+		function exportScript(qlik, download) {
+			var filename = qlik.currApp(this).model.layout.qTitle + "-script.txt";
+			engineApp.getScript().then(function (reply) {
+				var data = 'data:text/plain;charset=utf-8,' + encodeURIComponent(reply.qScript);
+				download(data, filename, "text/plain");	// Download in the browser
+				showMsg("Script exported to " + filename);
+			});
+		}	
+
+		//==== Script Import function ====	
+		function importScript(qlik) {
+			$("#devtool-input-file").remove();
+			$('body').append('<input type="file" id="devtool-input-file" style="display:none;">');
+			$("#devtool-input-file").change(function(){
+				var input = $("#devtool-input-file")[0];
+				if (input.files.length > 0) {
+					var file = input.files[0];
+					var reader = new FileReader();
+					reader.onload = function(){	// Callback for read complete
+					// Ask user to confirm script replace
+						var r = confirm("Confirm replace of application script with " + file.name + "? The *entire* script will be replaced.");
+						if (r == true) {
+						engineApp.setScript(reader.result);	// Replace the script in the app
+						showMsg("Script replaced from " + file.name);
+						} else {
+							showMsg("Script replace cancelled");
+						}
+					};
+					reader.readAsText(file);	// Read the file contents, onload() will fire when done	
+				} else {
+					showMsg("No file selected");
+				}
+				$("#devtool-input-file").remove();
+			});
+			$("#devtool-input-file").click();
+		}
+
+		//==== Variables Export function ====
+		function exportVariables(qlik, download, filetype) {
+			if(filetype == "script") {
+				var str="";
+				var lastSort="";
+				getVariables(engineApp).then(function(vars){
+					vars.map(function(v){
+						v.devtoolSortGroup = (v.qIsReserved ? '11' : v.qIsScriptCreated ? '21' : '22');
+						return v;
+					}).sort(function(a,b){
+						var av = a.devtoolSortGroup + a.qName;
+						var bv = b.devtoolSortGroup + b.qName;
+						return av == bv ? 0 : av  < bv ? -1 : 1;
+					}).forEach(function(v) {
+						if(v.devtoolSortGroup != lastSort) {
+							switch (v.devtoolSortGroup) {
+								case "11":
+									str += "// ***** Reserved Variables *****\r\n";
+									break;
+								case "21":
+									str += "// *****  Script Defined Variables ***** \r\n";
+									break;
+								case "22":
+									str += "// *****  Non-script Defined Variables ***** \r\n";
+									break;
+								default:
+									break;
+							}
+						}
+						lastSort = v.devtoolSortGroup;
+						var comment = v.qComment != undefined ? "// " + v.qComment : "";
+						str += "SET " + v.qName + "='"  + v.qDefinition + "';"  + comment + "\r\n";
+					});
+					
+					var filename = qlik.currApp(this).model.layout.qTitle + "-variables.txt";
+					var data = 'data:text/plain;charset=utf-8,' + encodeURIComponent(str);
+					download(data, filename, "text/plain");	// Download in the browser
+					showMsg("Variables exported to " + filename);
+				});
+			}
+			else {
+				var str="";
+				getVariables(engineApp).then(function(vars){
+					var filename = qlik.currApp(this).model.layout.qTitle + "-variables.json";
+					var data = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(vars, null, 2));
+					download(data, filename, "application/json");	// Download in the browser
+					showMsg("Variables exported to " + filename);
+				});
+			}
+		}
+
+		//===== Get all variables in app ====
+		function getVariables(app) {	
+			return app.createSessionObject({
+				qVariableListDef: {
+					qType: 'variable',
+					qShowReserved: true,
+					qShowConfig: true,
+					qMeta: {}
+				},
+				qInfo: { qId: "VariableList", qType: "VariableList" }
+			}).then(function (list) {
+				return list.getLayout().then(function (layout) {
+					return Promise.all(layout.qVariableList.qItems.map(function (d) {
+						return app.getVariableById(d.qInfo.qId).then(function (variable) {
+							return variable.getProperties().then(function(properties) {
+								if (d.qIsScriptCreated) properties.qIsScriptCreated = d.qIsScriptCreated;
+								if (d.qIsReserved) properties.qIsReserved = d.qIsReserved;
+								if (d.qIsConfig) properties.qIsConfig = d.qIsConfig;
+								return properties; 
+							});
+						});
+					}));
+				});
+			});
+		}
 
 		return {
 			initialProperties: {
 				version: 2.0,
 				showTitles: false
 			}, paint: function ($element) {
-				$(".devtool-btn").remove();
+				$(".devtool-btn.fab").remove();
 				$(document.body).append("<button class='devtool-btn fab'><i class='material-icons'>settings</i></button>");
-				$(".devtool-btn").on("click", toggleId);
+				$(".devtool-btn.fab").on("click", toggleId);
+				if (!modalsInitialized) {
+					initModals(qlik, download, devtoolHtml)
+				}
+				$(".devtool-btn.fab").contextMenu('menu', $('#devtool-context-menu'), {
+					'triggerOn' : "contextmenu",
+					'displayAround' : 'trigger'
+				});
 			}
 		};
-
-	});
+});

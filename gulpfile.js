@@ -14,6 +14,10 @@ gulp.task('js', function (ready) {
 	return gulp.src(SRC + '/**/*.js')
 		.pipe(gulp.dest(DIST));
 });
+gulp.task('html', function (ready) {
+	return gulp.src(SRC + '/**/*.html')
+		.pipe(gulp.dest(DIST));
+});
 gulp.task('qext', function () {
 	var qext = {
 		name: pkg.name,
@@ -61,7 +65,7 @@ gulp.task('clean', function (ready) {
 	ready();
 });
 
-gulp.task('zip-build', ['qext', 'less', 'css', 'js'], function () {
+gulp.task('zip-build', ['qext', 'less', 'css', 'js', 'html'], function () {
 	var zip = require('gulp-zip');
 	return gulp.src(DIST + '/**/*')
 		.pipe(zip(NAME + '.zip'))
@@ -74,7 +78,7 @@ gulp.task('build', function () {
 	);
 });
 
-gulp.task('debug', ['less', 'qext', 'css', 'js'], function () {
+gulp.task('debug', ['less', 'qext', 'css', 'js', 'html'], function () {
 	return gulp.src([DIST + '/**/*'])
 		.pipe(gulp.dest(DEPLOY));
 });
