@@ -1,7 +1,10 @@
 # Qlik Sense Dev tool
 Developer tool extension for Qlik Sense
 
-##Allows the user to display id, type, handle and properties for visualizations.
+You might want to take a look at Add Sense from Chrome, a Chrome Extension that covers most of what the Qlik Sense extension does and also works in mashups, iframe's and without needing to modify the Qlik Sense app. You find it here:
+https://chrome.google.com/webstore/detail/add-sense/bbiljflfafkaejgdebbnmcohpidgkejj
+
+## Allows the user to display id, type, handle and properties for visualizations.
 
 This extension adds a floating action button to your Qlik Sense app. When you press the button it will add labels with id, type and handle to all visualizations on the sheet. The labels also contains buttons to display properties for the visualizations. And from version 3 they also containg some data on calculations and calculation times.
 
